@@ -541,6 +541,7 @@ function setupEvents() {
   const rulesOverlay = document.getElementById('rulesOverlay');
   document.getElementById('infoBtn').addEventListener('click', () => (rulesOverlay.hidden = false));
   document.getElementById('rulesClose').addEventListener('click', () => (rulesOverlay.hidden = true));
+  document.getElementById('rulesCloseX').addEventListener('click', () => (rulesOverlay.hidden = true));
   rulesOverlay.addEventListener('click', (e) => {
     if (e.target === rulesOverlay) rulesOverlay.hidden = true;
   });

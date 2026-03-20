@@ -445,6 +445,25 @@ button:hover {
   width: 420px;
   max-height: 80vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #eee;
+  background: none;
 }
 
 .rules-content {

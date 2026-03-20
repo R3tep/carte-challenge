@@ -79,6 +79,7 @@
     </div>
     <div class="modal-overlay" id="rulesOverlay" hidden>
       <div class="modal rules-modal">
+        <button class="modal-close" id="rulesCloseX">&times;</button>
         <h3 class="modal-title">Règles du challenge</h3>
         <div class="rules-content">
           <h4>Gagner des points</h4>
@@ -109,11 +110,21 @@
             <li>Interdit d'acheter des cartes ou paquets de cartes</li>
             <li>Interdit d'utiliser la téléportation (potions, etc.)</li>
             <li>Pas de PL, pas de dons</li>
-            <li>La nouvelle zone doit être adjacente et accessible à pied</li>
+            <li>La nouvelle zone doit être adjacente et accessible à pied (exception : les îles)</li>
           </ul>
 
           <h4>Zones</h4>
           <p>190 zones au total (111 territoires, 42 donjons, ~40 autres) — 700 points pour tout débloquer.</p>
+
+          <h4>Règles optionnelles (mode difficile)</h4>
+          <p>Pour corser le challenge, vous pouvez activer ces restrictions :</p>
+          <ul class="rules-list">
+            <li>Pas de doublons dans la team</li>
+            <li>Temple de classe débloqué pour équiper un Dofus (ex : temple Féca pour un Dofus sur un Féca)</li>
+            <li>Donjon d'obtention débloqué pour équiper le Dofus correspondant (ex : Donjon des Bouftous pour le Dofus Cawotte)</li>
+            <li>Sort « Apprivoisement de Dragodinde » requis pour équiper une monture</li>
+            <li>Donjon « Sanctuaire des Familiers » débloqué pour équiper un familier</li>
+          </ul>
         </div>
         <div class="modal-actions">
           <button type="button" id="rulesClose">Fermer</button>
