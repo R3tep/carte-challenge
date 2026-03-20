@@ -3,13 +3,57 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carte challenge - Tracker de zones</title>
+    <title>TTG Challenge Dofus Retro - Tracker de zones interactif</title>
+    <meta name="description" content="Tracker interactif pour le challenge TTG sur Dofus Retro. Suivez votre progression, débloquez des zones, gérez vos donjons et temples sur la carte du monde." />
+    <meta name="keywords" content="Dofus Retro, challenge, TTG, tracker, carte, zones, donjons, temples, progression, MMORPG" />
+    <meta name="author" content="TTG" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="TTG Challenge Dofus Retro" />
+    <meta property="og:description" content="Tracker interactif pour le challenge TTG sur Dofus Retro. Débloquez des zones, gérez vos donjons et temples." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://r3tep.github.io/carte-challenge/" />
+    <meta property="og:image" content="https://r3tep.github.io/carte-challenge/public/favicon.svg" />
+    <meta property="og:locale" content="fr_FR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="TTG Challenge Dofus Retro" />
+    <meta name="twitter:description" content="Tracker interactif pour le challenge TTG sur Dofus Retro." />
+
+    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
+    <link rel="canonical" href="https://r3tep.github.io/carte-challenge/" />
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TTG Challenge Dofus Retro",
+      "description": "Tracker interactif pour le challenge TTG sur Dofus Retro. Suivez votre progression, débloquez des zones, gérez vos donjons et temples sur la carte du monde.",
+      "url": "https://r3tep.github.io/carte-challenge/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "fr",
+      "about": {
+        "@type": "VideoGame",
+        "name": "Dofus Retro"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Righteous&family=Almendra:wght@700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="toolbar">
-      <h1>Carte Challenge</h1>
-      <button class="info-btn" id="infoBtn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 8v5M9 5.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    <nav class="toolbar" aria-label="Barre d'outils">
+      <img src="public/favicon.svg" alt="" width="28" height="28" />
+      <h1>TTG Challenge <br><span class="subtitle">Dofus Retro</span></h1>
+      <button class="rules-btn" id="infoBtn">Règles</button>
       <div class="stats" id="stats">Chargement...</div>
       <div class="points-input">
         <label for="pointsField">Points :</label>
@@ -20,12 +64,12 @@
       <button id="importBtn">Importer</button>
       <input type="file" id="importFile" accept=".json" hidden />
       <button id="clearBtn">Tout effacer</button>
-    </div>
-    <div class="main-layout">
-      <div class="map-container" id="mapContainer">
+    </nav>
+    <main class="main-layout">
+      <div class="map-container" id="mapContainer" role="application" aria-label="Carte du monde Dofus">
         <div class="map-grid" id="mapGrid"></div>
       </div>
-      <div class="sidebar" id="sidebar">
+      <aside class="sidebar" id="sidebar" aria-label="Listes de progression">
         <div class="sidebar-section" id="sectionDonjons">
           <h2 class="sidebar-title donjon-color">
             <span>Donjons <em class="section-count" id="donjonCount"></em></span>
@@ -58,10 +102,10 @@
             <ul class="poi-list" id="autreList"></ul>
           </div>
         </div>
-      </div>
+      </aside>
 
       <div class="modal-overlay" id="modalOverlay" hidden>
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true">
           <h3 class="modal-title" id="modalTitle"></h3>
           <form class="add-form" id="modalForm">
             <input type="text" placeholder="Nom" required id="modalName" />
@@ -76,12 +120,13 @@
           </form>
         </div>
       </div>
-    </div>
+    </main>
     <div class="modal-overlay" id="rulesOverlay" hidden>
-      <div class="modal rules-modal">
+      <div class="modal rules-modal" role="dialog" aria-modal="true" aria-label="Règles du challenge">
         <button class="modal-close" id="rulesCloseX">&times;</button>
         <h3 class="modal-title">Règles du challenge</h3>
         <div class="rules-content">
+          <p>Un challenge sur <strong>Dofus Retro</strong> qui transforme l'aventure en une exploration stratégique : vous devez débloquer les zones une par une pour progresser, rendant chaque avancée unique et plus difficile.</p>
           <h4>Gagner des points</h4>
           <table class="rules-table">
             <tr><td>Carte 1-2 étoiles</td><td>1 point</td></tr>
