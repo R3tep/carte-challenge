@@ -1,0 +1,505 @@
+/* === Reset === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #1a1a2e;
+  color: #eee;
+  font-family: system-ui, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* === Toolbar === */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #16213e;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.toolbar h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.info-btn {
+  background: none;
+  border: none;
+  color: #888;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.info-btn:hover {
+  color: #eee;
+  background: none;
+}
+
+.stats {
+  font-size: 13px;
+  color: #aaa;
+  flex: 1;
+}
+
+.stats .count {
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+.points-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.points-input label {
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.points-input input {
+  width: 60px;
+  padding: 4px 6px;
+  background: #0d1b2a;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.points-info {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+button {
+  padding: 8px 16px;
+  background: #333;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #444;
+}
+
+/* === Layout === */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* === Map === */
+.map-container {
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+  position: relative;
+}
+
+.map-container:active {
+  cursor: grabbing;
+}
+
+.map-grid {
+  position: absolute;
+  transform-origin: 0 0;
+  background-image: url('public/map-base.jpg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* === Cells === */
+.cell {
+  position: absolute;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  background-color: transparent;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.cell:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+.cell.unlocked {
+  background-color: rgba(255, 140, 0, 0.5);
+}
+
+.cell.unlocked:hover {
+  background-color: rgba(255, 140, 0, 0.65);
+}
+
+.cell.has-donjon {
+  background-color: rgba(220, 50, 50, 0.5);
+}
+
+.cell.has-donjon:hover {
+  background-color: rgba(220, 50, 50, 0.65);
+}
+
+.cell.has-temple {
+  background-color: rgba(160, 80, 220, 0.5);
+}
+
+.cell.has-temple:hover {
+  background-color: rgba(160, 80, 220, 0.65);
+}
+
+.cell.hover-highlight {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.cell.unlocked.hover-highlight {
+  background-color: rgba(255, 140, 0, 0.65);
+}
+
+.cell.has-donjon.hover-highlight {
+  background-color: rgba(220, 50, 50, 0.65);
+}
+
+.cell.has-temple.hover-highlight {
+  background-color: rgba(160, 80, 220, 0.65);
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: 260px;
+  background: #16213e;
+  border-left: 1px solid #333;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #333;
+}
+
+.sidebar-section.has-items {
+  flex: 1;
+}
+
+.sidebar-section.collapsed {
+  flex: 0 0 auto;
+}
+
+.sidebar-section.collapsed .sidebar-content {
+  display: none;
+}
+
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #16213e;
+  flex-shrink: 0;
+}
+
+.sidebar-title span {
+  flex: 1;
+}
+
+.sidebar-title:hover {
+  background: #1a2744;
+}
+
+.sidebar-title::after {
+  content: '\25BE';
+  font-size: 11px;
+  color: #666;
+}
+
+.sidebar-section.collapsed .sidebar-title::after {
+  content: '\25B8';
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar-content .poi-list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.add-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #888;
+  display: flex;
+  align-items: center;
+}
+
+.add-btn:hover {
+  color: #eee;
+  background: none;
+}
+
+.section-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: #888;
+}
+
+/* === Color themes === */
+.donjon-color { color: #dc3232; }
+.temple-color { color: #a050dc; }
+.zone-color   { color: #ff8c00; }
+.autre-color  { color: #5bb8a9; }
+
+/* === POI list items === */
+.poi-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.poi-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: #0d1b2a;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.poi-item .poi-name  { font-weight: 600; }
+.poi-item .poi-coords { color: #888; font-size: 11px; }
+
+.poi-item .poi-delete {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.poi-item .poi-delete:hover { color: #ff4444; }
+
+.poi-item.donjon-item .poi-name { color: #dc3232; }
+.poi-item.temple-item .poi-name { color: #a050dc; }
+.poi-item.zone-item .poi-name   { color: #ff8c00; }
+.poi-item.autre-item .poi-name  { color: #5bb8a9; }
+
+.temple-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.temple-check input[type='checkbox'] {
+  accent-color: #a050dc;
+  cursor: pointer;
+}
+
+.empty-msg {
+  color: #555;
+  font-size: 12px;
+  padding: 8px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* === Tooltip === */
+.tooltip {
+  position: fixed;
+  background: #16213e;
+  border: 1px solid #555;
+  color: #eee;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  pointer-events: none;
+  display: none;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.tooltip .zone-name   { font-weight: 600; color: #ff8c00; }
+.tooltip .donjon-info { font-weight: 600; color: #dc3232; }
+.tooltip .temple-info { font-weight: 600; color: #a050dc; }
+
+/* === Modals === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  background: #16213e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 20px;
+  width: 280px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+.modal-actions button[type='button'] {
+  background: transparent;
+  border-color: #555;
+}
+
+/* === Add form (modal) === */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-form input {
+  padding: 6px 8px;
+  background: #0d1b2a;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.add-form input::placeholder {
+  color: #666;
+}
+
+.coord-row {
+  display: flex;
+  gap: 6px;
+}
+
+.coord-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-form button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* === Rules modal === */
+.rules-modal {
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.rules-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rules-content h4 {
+  font-size: 13px;
+  color: #ff8c00;
+  border-bottom: 1px solid #333;
+  padding-bottom: 4px;
+}
+
+.rules-table {
+  width: 100%;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+
+.rules-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #222;
+}
+
+.rules-table td:last-child {
+  text-align: right;
+  color: #ff8c00;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rules-note {
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
+}
+
+.rules-list {
+  list-style: none;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rules-list li::before {
+  content: '\2014\00a0';
+  color: #ff4444;
+}
+
+.rules-content > p {
+  font-size: 12px;
+  color: #aaa;
+}

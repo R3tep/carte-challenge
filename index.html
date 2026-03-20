@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carte challenge - Tracker de zones</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="toolbar">
+      <h1>Carte Challenge</h1>
+      <button class="info-btn" id="infoBtn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 8v5M9 5.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      <div class="stats" id="stats">Chargement...</div>
+      <div class="points-input">
+        <label for="pointsField">Points :</label>
+        <input type="number" id="pointsField" min="0" value="0" />
+        <span class="points-info" id="pointsInfo"></span>
+      </div>
+      <button id="exportBtn">Exporter</button>
+      <button id="importBtn">Importer</button>
+      <input type="file" id="importFile" accept=".json" hidden />
+      <button id="clearBtn">Tout effacer</button>
+    </div>
+    <div class="main-layout">
+      <div class="map-container" id="mapContainer">
+        <div class="map-grid" id="mapGrid"></div>
+      </div>
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-section" id="sectionDonjons">
+          <h2 class="sidebar-title donjon-color">
+            <span>Donjons <em class="section-count" id="donjonCount"></em></span>
+            <button class="add-btn" id="addDonjonBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          </h2>
+          <div class="sidebar-content">
+            <ul class="poi-list" id="donjonList"></ul>
+          </div>
+        </div>
+        <div class="sidebar-section" id="sectionTemples">
+          <h2 class="sidebar-title temple-color">
+            <span>Temples <em class="section-count" id="templeCount"></em></span>
+          </h2>
+          <div class="sidebar-content">
+            <ul class="poi-list" id="templeList"></ul>
+          </div>
+        </div>
+        <div class="sidebar-section" id="sectionZones">
+          <h2 class="sidebar-title zone-color"><span>Zones déverrouillées</span></h2>
+          <div class="sidebar-content">
+            <ul class="poi-list" id="zoneList"></ul>
+          </div>
+        </div>
+        <div class="sidebar-section" id="sectionAutres">
+          <h2 class="sidebar-title autre-color">
+            <span>Autres <em class="section-count" id="autreCount"></em></span>
+            <button class="add-btn" id="addAutreBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          </h2>
+          <div class="sidebar-content">
+            <ul class="poi-list" id="autreList"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="modalOverlay" hidden>
+        <div class="modal">
+          <h3 class="modal-title" id="modalTitle"></h3>
+          <form class="add-form" id="modalForm">
+            <input type="text" placeholder="Nom" required id="modalName" />
+            <div class="coord-row">
+              <input type="number" placeholder="X" required id="modalX" />
+              <input type="number" placeholder="Y" required id="modalY" />
+            </div>
+            <div class="modal-actions">
+              <button type="submit">Ajouter</button>
+              <button type="button" id="modalCancel">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="rulesOverlay" hidden>
+      <div class="modal rules-modal">
+        <h3 class="modal-title">Règles du challenge</h3>
+        <div class="rules-content">
+          <h4>Gagner des points</h4>
+          <table class="rules-table">
+            <tr><td>Carte 1-2 étoiles</td><td>1 point</td></tr>
+            <tr><td>Carte 3 étoiles</td><td>2 points</td></tr>
+            <tr><td>Carte 4 étoiles</td><td>3 points</td></tr>
+            <tr><td>Complétion d'une famille</td><td>1 point</td></tr>
+          </table>
+          <p class="rules-note">Après complétion du classeur :</p>
+          <table class="rules-table">
+            <tr><td>Drop Dofus Émeraude</td><td>1 point</td></tr>
+            <tr><td>Drop autre Dofus</td><td>5 points</td></tr>
+          </table>
+
+          <h4>Coût de déblocage</h4>
+          <table class="rules-table">
+            <tr><td>Zones 1 à 25</td><td>1 pt / zone</td></tr>
+            <tr><td>Zones 26 à 50</td><td>2 pts / zone</td></tr>
+            <tr><td>Zones 51 à 75</td><td>3 pts / zone</td></tr>
+            <tr><td>Zones 76 à 100</td><td>4 pts / zone</td></tr>
+            <tr><td>Zones 101+</td><td>5 pts / zone</td></tr>
+          </table>
+
+          <h4>Interdictions</h4>
+          <ul class="rules-list">
+            <li>Interdit d'aller dans une zone non possédée</li>
+            <li>Interdit d'acheter des cartes ou paquets de cartes</li>
+            <li>Interdit d'utiliser la téléportation (potions, etc.)</li>
+            <li>Pas de PL, pas de dons</li>
+            <li>La nouvelle zone doit être adjacente et accessible à pied</li>
+          </ul>
+
+          <h4>Zones</h4>
+          <p>190 zones au total (111 territoires, 42 donjons, ~40 autres) — 700 points pour tout débloquer.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="rulesClose">Fermer</button>
+        </div>
+      </div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
