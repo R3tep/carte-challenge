@@ -672,7 +672,9 @@ const percent = (got, total) => (total ? Math.round((got / total) * 100) : 0);
 
 function buildAlbum() {
   const grid = document.getElementById('cardGrid');
-  for (const c of cardData.cards) {
+  // Album order: family (alphabetical), then rarity, then card number
+  const albumOrder = [...cardData.cards].sort((a, b) => a.f - b.f || a.s - b.s || a.n - b.n);
+  for (const c of albumOrder) {
     const card = createEl('button', 'album-card');
     card.type = 'button';
     card.dataset.n = c.n;
