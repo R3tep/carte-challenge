@@ -208,7 +208,11 @@ button:hover {
 }
 
 .poi-marker:hover {
+  /* override the global button:hover background shorthand */
   background-color: transparent;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
   opacity: 1;
   filter: grayscale(0.3) brightness(1) drop-shadow(0 0 2px #fff);
   z-index: 30;
