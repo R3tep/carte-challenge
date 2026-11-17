@@ -81,6 +81,22 @@ const TEMPLES = [
   { subareaId: null, name: 'Pandawa', key: 'pandawa', x: 5, y: 20 },
 ];
 
+// Class emblems drawn on the temple badges (24x24 viewBox)
+const TEMPLE_GLYPHS = {
+  Féca: '<path d="M12 2.5l7.5 3v5.5c0 5-3.2 8.6-7.5 10.5C7.7 19.6 4.5 16 4.5 11V5.5z"/><path class="g-line" d="M12 6v11M8 10.5h8"/>',
+  Osamodas: '<ellipse cx="12" cy="15.5" rx="4.6" ry="4"/><circle cx="5.6" cy="10.4" r="2.1"/><circle cx="9.3" cy="6.4" r="2.2"/><circle cx="14.7" cy="6.4" r="2.2"/><circle cx="18.4" cy="10.4" r="2.1"/>',
+  Enutrof: '<path d="M9 3.5h6l-1.8 3.2c3.8 1 6.8 4.8 6.8 8.6 0 3.3-3.2 5.2-8 5.2s-8-1.9-8-5.2c0-3.8 3-7.6 6.8-8.6z"/><path class="g-line" d="M9.5 6.7h5"/><circle class="g-dark" cx="12" cy="14.5" r="2.4"/>',
+  Sram: '<path d="M12 3c4.7 0 8 3.2 8 7.4 0 2.6-1.3 4.4-3 5.4V19a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19v-3.2c-1.7-1-3-2.8-3-5.4C4 6.2 7.3 3 12 3z"/><circle class="g-dark" cx="8.8" cy="10.8" r="2"/><circle class="g-dark" cx="15.2" cy="10.8" r="2"/><path class="g-line" d="M10.5 17.5v3M13.5 17.5v3"/>',
+  Xélor: '<path d="M5.5 2.5h13v2.2l-5 7.3 5 7.3v2.2h-13v-2.2l5-7.3-5-7.3z"/><path class="g-dark" d="M8.5 5h7l-3.5 5zM12 15.5l3.8 4h-7.6z"/>',
+  Ecaflip: '<rect x="4.5" y="4.5" width="15" height="15" rx="3" transform="rotate(12 12 12)"/><circle class="g-dark" cx="8.7" cy="8.2" r="1.5"/><circle class="g-dark" cx="12" cy="12" r="1.5"/><circle class="g-dark" cx="15.3" cy="15.8" r="1.5"/>',
+  Iop: '<path d="M20.5 3.5l-.6 3.4-8.4 8.4-2.8-2.8 8.4-8.4z"/><path d="M5.6 11.6l6.8 6.8-1.6 1.6-2-1.4-2.6 2.6-2.4-2.4 2.6-2.6-1.4-2z"/>',
+  Crâ: '<path d="M4.3 18.3L16.2 6.4l1.4 1.4L5.7 19.7z"/><path d="M21 3l-1.6 6.6-5-5z"/><path d="M2.5 17.5l2.4-.6 2.2 2.2-.6 2.4-1.4-1.4-1.6 1.6-1.6-1.6 1.6-1.6z"/>',
+  Sadida: '<path d="M4.5 19.5C4.5 10.5 10.5 4 20 4c0 9.5-6.5 15.5-15.5 15.5z"/><path class="g-line" d="M4.5 19.5L15 9M9 15l-.5-4M12 12l3 .5"/>',
+  Eniripsa: '<path d="M12 20.5S3.5 15.2 3.5 9.2A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8.5 2.2c0 6-8.5 11.3-8.5 11.3z"/><path class="g-line" d="M12 10v6M9 13h6"/>',
+  Sacrieur: '<path d="M12 2.5c3.3 5.2 6.5 8.5 6.5 12.5a6.5 6.5 0 0 1-13 0c0-4 3.2-7.3 6.5-12.5z"/><path class="g-line" d="M9 15.5a3 3 0 0 0 2.5 2.8"/>',
+  Pandawa: '<path d="M10 2.5h4v2.6h-.6v1.6c1.6.6 2.6 1.9 2.6 3.4 0 1.1-.5 2-1.3 2.7 2.4.9 4 3 4 5.4 0 2.6-3.2 4-6.7 4s-6.7-1.4-6.7-4c0-2.4 1.6-4.5 4-5.4-.8-.7-1.3-1.6-1.3-2.7 0-1.5 1-2.8 2.6-3.4V5.1H10z"/><path class="g-line" d="M7.7 15.5h8.6"/>',
+};
+
 const TEMPLE_SUBAREA_IDS = new Set(
   TEMPLES.filter((t) => t.subareaId !== null).map((t) => t.subareaId)
 );
@@ -269,7 +285,7 @@ function createMarkers() {
   const groups = {};
   const items = [
     ...DUNGEONS.map((d) => ({ type: 'donjon', key: d.id, x: d.x, y: d.y })),
-    ...TEMPLES.map((t) => ({ type: 'temple', key: getTempleKey(t), ...getTemplePosition(t) })),
+    ...TEMPLES.map((t) => ({ type: 'temple', key: getTempleKey(t), name: t.name, ...getTemplePosition(t) })),
   ].filter((m) => m.x !== undefined);
   for (const m of items) (groups[m.x + ',' + m.y] ||= []).push(m);
 
@@ -280,6 +296,12 @@ function createMarkers() {
       const el = document.createElement('button');
       el.type = 'button';
       el.className = `poi-marker ${m.type}-marker`;
+      if (m.type === 'temple') {
+        el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${TEMPLE_GLYPHS[m.name] || ''}</svg>`;
+        el.setAttribute('aria-label', `Temple ${m.name}`);
+      } else {
+        el.setAttribute('aria-label', DUNGEON_BY_ID[m.key].name);
+      }
       el.dataset.type = m.type;
       el.dataset.key = m.key;
       el.style.left = left + 'px';
