@@ -47,7 +47,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Righteous&family=Almendra:wght@700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <!-- bump ?v= on each release so browsers never mix a new page with an old script -->
+    <link rel="stylesheet" href="style.css?v=2" />
   </head>
   <body>
     <nav class="toolbar" aria-label="Barre d'outils">
@@ -55,9 +56,11 @@
       <h1>TTG Challenge <br><span class="subtitle">Dofus Retro</span></h1>
       <button class="rules-btn" id="infoBtn">Règles</button>
       <div class="stats" id="stats">Chargement...</div>
+      <button class="album-btn" id="albumBtn">Album</button>
       <div class="points-input">
-        <label for="pointsField">Points :</label>
-        <input type="number" id="pointsField" min="0" value="0" />
+        <span>Points : <strong id="pointsTotal">0</strong></span>
+        <label for="bonusField" title="Points gagnés en droppant des Dofus après complétion du classeur">Bonus Dofus :</label>
+        <input type="number" id="bonusField" min="0" value="0" />
         <span class="points-info" id="pointsInfo"></span>
       </div>
       <button id="exportBtn">Exporter</button>
@@ -123,6 +126,7 @@
         <div class="rules-content">
           <p>Un challenge sur <strong>Dofus Retro</strong> qui transforme l'aventure en une exploration stratégique : vous devez débloquer les zones une par une pour progresser, rendant chaque avancée unique et plus difficile.</p>
           <h4>Gagner des points</h4>
+          <p class="rules-note">Les points des cartes et des familles sont calculés automatiquement depuis l'album. Seuls les Dofus se saisissent à la main (« Bonus Dofus »).</p>
           <table class="rules-table">
             <tr><td>Carte 1-2 étoiles</td><td>1 point</td></tr>
             <tr><td>Carte 3 étoiles</td><td>2 points</td></tr>
@@ -170,7 +174,53 @@
         </div>
       </div>
     </div>
+    <div class="modal-overlay" id="albumOverlay" hidden>
+      <div class="album" role="dialog" aria-modal="true" aria-label="Album de cartes TTG">
+        <button class="album-close" id="albumClose" aria-label="Fermer">&times;</button>
+        <section class="album-page album-left">
+          <h3 class="album-title">Ma collection</h3>
+          <div class="album-points" id="albumPoints"></div>
+          <div class="album-stats">
+            <div>
+              <h4 class="album-subtitle">Par types :</h4>
+              <div class="album-type" id="typeStats"></div>
+            </div>
+            <div>
+              <h4 class="album-subtitle">Par raretés :</h4>
+              <div class="rarity-grid" id="rarityStats"></div>
+            </div>
+          </div>
+          <h4 class="album-subtitle">Par familles :</h4>
+          <div class="family-grid" id="familyGrid"></div>
+        </section>
+        <section class="album-page album-right">
+          <div class="album-right-head">
+            <h3 class="album-title">
+              <img class="album-heading-icon" id="albumHeadingIcon" alt="" hidden />
+              <span id="albumHeading">Collection TTG complète</span>
+              <button type="button" class="album-family-clear" id="albumFamilyClear" aria-label="Revenir à toute la collection" data-tip="Revenir à toute la collection" hidden>×</button>
+            </h3>
+            <input type="search" id="albumSearch" placeholder="Rechercher… ( / )" aria-label="Rechercher une carte par nom ou numéro" />
+          </div>
+          <div class="album-filters">
+            <div class="album-segment" role="group" aria-label="Afficher">
+              <button type="button" data-own="all">Toutes</button>
+              <button type="button" data-own="owned">Possédées</button>
+              <button type="button" data-own="missing">Manquantes</button>
+            </div>
+            <button type="button" class="album-reset" id="albumReset" hidden>Réinitialiser</button>
+            <span class="album-result-count" id="albumCount"></span>
+          </div>
+          <div class="card-grid" id="cardGrid"></div>
+          <div class="album-empty" id="albumEmpty" hidden>
+            <p>Aucune carte ne correspond à ces filtres.</p>
+            <button type="button" id="albumEmptyReset">Réinitialiser les filtres</button>
+          </div>
+        </section>
+      </div>
+      <div class="album-tip" id="albumTip" hidden></div>
+    </div>
     <div class="tooltip" id="tooltip"></div>
-    <script src="app.js"></script>
+    <script src="app.js?v=2"></script>
   </body>
 </html>

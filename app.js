@@ -129,7 +129,16 @@ let unlockedSubareas = new Set(
 let unlockedTemples = new Set(JSON.parse(localStorage.getItem('cartdof_temples_v2') || '[]'));
 let autres = JSON.parse(localStorage.getItem('cartdof_autres') || '[]');
 let unlockedDonjons = loadDonjons();
-let totalPoints = parseInt(localStorage.getItem('cartdof_points') || '0');
+let ownedCards = new Set(JSON.parse(localStorage.getItem('cartdof_cards') || '[]'));
+// Before the album, points were typed by hand: carry them over as bonus once
+let bonusPoints = parseInt(
+  localStorage.getItem('cartdof_bonus') ?? localStorage.getItem('cartdof_points') ?? '0'
+);
+let cardData = { families: [], cards: [] };
+// Album filters: one family, any set of rarities, and owned / missing / all
+let albumFamily = null;
+const albumRarities = new Set();
+let albumOwnership = 'all';
 
 let scale = 1;
 let offsetX = 0;
@@ -154,6 +163,25 @@ const statsEl = document.getElementById('stats');
 const tooltipEl = document.getElementById('tooltip');
 
 // === Points system ===
+
+// Points per card by star count; a completed family is worth one more point
+const STAR_POINTS = { 1: 1, 2: 1, 3: 2, 4: 3 };
+
+function getFamilyProgress(f) {
+  const cards = cardData.cards.filter((c) => c.f === f);
+  return { owned: cards.filter((c) => ownedCards.has(c.n)).length, total: cards.length };
+}
+
+function getPoints() {
+  let cards = 0;
+  for (const c of cardData.cards) if (ownedCards.has(c.n)) cards += STAR_POINTS[c.s];
+  let families = 0;
+  cardData.families.forEach((_, f) => {
+    const { owned, total } = getFamilyProgress(f);
+    if (owned === total) families++;
+  });
+  return { cards, families, bonus: bonusPoints, total: cards + families + bonusPoints };
+}
 
 function getCostForNth(n) {
   for (const tier of COST_TIERS) {
@@ -253,6 +281,11 @@ function toggleTempleByKey(key) {
 
 function saveZones() {
   localStorage.setItem('cartdof_unlocked', JSON.stringify([...unlockedSubareas]));
+}
+
+function saveAlbum() {
+  localStorage.setItem('cartdof_cards', JSON.stringify([...ownedCards]));
+  localStorage.setItem('cartdof_bonus', bonusPoints);
 }
 
 function savePOI() {
@@ -413,6 +446,8 @@ function updateStats() {
 function updatePointsInfo() {
   const infoEl = document.getElementById('pointsInfo');
   const count = getTotalUnlocked();
+  const totalPoints = getPoints().total;
+  document.getElementById('pointsTotal').textContent = totalPoints;
   const { extra, remaining } = getAffordableUnlocks(totalPoints, count);
 
   if (totalPoints === 0) {
@@ -602,6 +637,327 @@ function clearHoverHighlight() {
   }
 }
 
+// === Card album ===
+
+const ALBUM_ROWS = 3;
+const ALBUM_GAP = 14;
+const cardElements = {};
+const familyElements = [];
+const rarityElements = {};
+let ownedTypeRow = null;
+
+function createEl(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function iconImg(src, className) {
+  const img = createEl('img', className);
+  img.src = src;
+  img.alt = '';
+  return img;
+}
+
+function progressBar(owned, total) {
+  const bar = createEl('span', 'album-bar');
+  const fill = createEl('span', 'album-bar-fill');
+  fill.style.width = (total ? (owned / total) * 100 : 0) + '%';
+  bar.appendChild(fill);
+  return bar;
+}
+
+const percent = (got, total) => (total ? Math.round((got / total) * 100) : 0);
+
+function buildAlbum() {
+  const grid = document.getElementById('cardGrid');
+  for (const c of cardData.cards) {
+    const card = createEl('button', 'album-card');
+    card.type = 'button';
+    card.dataset.n = c.n;
+    card.hidden = true;
+
+    const img = iconImg(`public/cards/${c.n}.webp`, 'album-card-img');
+    img.loading = 'lazy';
+    card.append(
+      img,
+      iconImg(`public/families/${c.f}.webp`, 'album-card-family'),
+      createEl('span', 'album-card-name', c.name),
+      createEl('span', 'album-card-num', '#' + c.n),
+      createEl('span', 'album-slot-label', `#${c.n} ${c.name}`),
+      createEl('span', 'album-slot-rarity', `Rareté : ${c.s}`)
+    );
+
+    cardElements[c.n] = card;
+    grid.appendChild(card);
+  }
+
+  const rarityStats = document.getElementById('rarityStats');
+  for (const s of [1, 2, 3, 4]) {
+    const row = createEl('button', `rarity-row r${s}`);
+    row.type = 'button';
+    row.dataset.rarity = s;
+    row.setAttribute('aria-label', `Filtrer les cartes de rareté ${s}`);
+    row.append(iconImg(`public/icons/rarity-${s}.webp`, 'rarity-icon'), progressBar(0, 1));
+    rarityElements[s] = row;
+    rarityStats.appendChild(row);
+  }
+
+  const familyGrid = document.getElementById('familyGrid');
+  cardData.families.forEach((name, f) => {
+    const medal = createEl('button', 'family-medal');
+    medal.type = 'button';
+    medal.dataset.f = f;
+    medal.appendChild(iconImg(`public/families/${f}.webp`, 'family-medal-icon'));
+    familyElements[f] = medal;
+    familyGrid.appendChild(medal);
+  });
+}
+
+function getVisibleCards() {
+  const query = normalizeName(document.getElementById('albumSearch').value);
+  return cardData.cards.filter(
+    (c) =>
+      (albumFamily === null || c.f === albumFamily) &&
+      (albumRarities.size === 0 || albumRarities.has(c.s)) &&
+      (albumOwnership === 'all' || (albumOwnership === 'owned') === ownedCards.has(c.n)) &&
+      (!query || normalizeName(c.name).includes(query) || String(c.n) === query.replace('#', ''))
+  );
+}
+
+const hasAlbumFilters = () =>
+  albumFamily !== null ||
+  albumRarities.size > 0 ||
+  albumOwnership !== 'all' ||
+  document.getElementById('albumSearch').value.trim() !== '';
+
+function resetAlbumFilters() {
+  albumFamily = null;
+  albumRarities.clear();
+  albumOwnership = 'all';
+  document.getElementById('albumSearch').value = '';
+  filterCards();
+}
+
+function renderFilterState() {
+  familyElements.forEach((m, f) => m.classList.toggle('selected', f === albumFamily));
+  document.getElementById('familyGrid').classList.toggle('filtering', albumFamily !== null);
+  for (const s of [1, 2, 3, 4]) {
+    rarityElements[s].classList.toggle('selected', albumRarities.has(s));
+    rarityElements[s].setAttribute('aria-pressed', albumRarities.has(s));
+  }
+  document.getElementById('rarityStats').classList.toggle('filtering', albumRarities.size > 0);
+  ownedTypeRow?.classList.toggle('selected', albumOwnership === 'owned');
+  for (const b of document.querySelectorAll('.album-segment button')) {
+    b.classList.toggle('active', b.dataset.own === albumOwnership);
+    b.setAttribute('aria-pressed', b.dataset.own === albumOwnership);
+  }
+
+  document.getElementById('albumReset').hidden = !hasAlbumFilters();
+  document.getElementById('albumHeading').textContent =
+    albumFamily === null ? 'Collection TTG complète' : cardData.families[albumFamily];
+  const familyIcon = document.getElementById('albumHeadingIcon');
+  familyIcon.hidden = albumFamily === null;
+  if (albumFamily !== null) familyIcon.src = `public/families/${albumFamily}.webp`;
+  document.getElementById('albumFamilyClear').hidden = albumFamily === null;
+}
+
+// Count what the grid currently shows (cards toggled since the last filter stay put)
+function renderResultCount() {
+  const shown = cardData.cards.filter((c) => !cardElements[c.n].hidden);
+  const got = shown.filter((c) => ownedCards.has(c.n)).length;
+  document.getElementById('albumCount').textContent = `${got} / ${shown.length}`;
+  document.getElementById('albumCount').dataset.tip = `${got} possédée${got > 1 ? 's' : ''} sur ${shown.length} carte${shown.length > 1 ? 's' : ''} affichée${shown.length > 1 ? 's' : ''}`;
+  document.getElementById('albumEmpty').hidden = shown.length > 0;
+  document.getElementById('cardGrid').hidden = shown.length === 0;
+}
+
+// Size the cards so ALBUM_ROWS rows fit the page height; the rest scrolls
+function layoutAlbumGrid() {
+  const grid = document.getElementById('cardGrid');
+  const cardH = Math.floor((grid.clientHeight - ALBUM_GAP * (ALBUM_ROWS - 1)) / ALBUM_ROWS);
+  if (cardH <= 0) return;
+  const cardW = Math.floor((cardH * 200) / 308);
+  const width = grid.clientWidth;
+  const cols = Math.max(1, Math.floor((width + ALBUM_GAP) / (cardW + ALBUM_GAP)));
+  grid.style.gridTemplateColumns = `repeat(${cols}, ${cardW}px)`;
+  grid.style.gridAutoRows = `${cardH}px`;
+  grid.style.setProperty('--card-w', cardW + 'px');
+}
+
+function filterCards() {
+  const shown = new Set(getVisibleCards().map((c) => c.n));
+  for (const c of cardData.cards) cardElements[c.n].hidden = !shown.has(c.n);
+  renderFilterState();
+  renderResultCount();
+  document.getElementById('cardGrid').scrollTop = 0;
+}
+
+function refreshAlbum() {
+  for (const c of cardData.cards) cardElements[c.n]?.classList.toggle('owned', ownedCards.has(c.n));
+
+  const owned = cardData.cards.filter((c) => ownedCards.has(c.n));
+  const totalCards = cardData.cards.length;
+  const totalFamilies = cardData.families.length;
+  const completeFamilies = cardData.families.filter((_, f) => {
+    const { owned: got, total } = getFamilyProgress(f);
+    return got === total;
+  }).length;
+
+  const typeRow = (tag, icon, got, total, tip) => {
+    const row = createEl(tag, 'album-type-row');
+    row.dataset.tip = tip;
+    row.append(iconImg(icon, 'album-type-icon'), createEl('span', 'album-count', `${got} / ${total}`), progressBar(got, total));
+    return row;
+  };
+  ownedTypeRow = typeRow('button', 'public/icons/type-cards.webp', owned.length, totalCards,
+    `Cartes possédées : ${owned.length} / ${totalCards} (${percent(owned.length, totalCards)}%)\nCliquer pour n'afficher que les cartes possédées`);
+  ownedTypeRow.type = 'button';
+  ownedTypeRow.id = 'ownedTypeRow';
+  ownedTypeRow.classList.toggle('selected', albumOwnership === 'owned');
+  document.getElementById('typeStats').replaceChildren(
+    ownedTypeRow,
+    typeRow('div', 'public/icons/type-families.webp', completeFamilies, totalFamilies,
+      `Familles complètes : ${completeFamilies} / ${totalFamilies}`)
+  );
+
+  for (const s of [1, 2, 3, 4]) {
+    const total = cardData.cards.filter((c) => c.s === s).length;
+    const got = owned.filter((c) => c.s === s).length;
+    const row = rarityElements[s];
+    if (!row) continue;
+    row.querySelector('.album-bar').replaceWith(progressBar(got, total));
+    row.dataset.tip = `Rareté ${s} : ${got} / ${total} (${percent(got, total)}%)\n${STAR_POINTS[s]} point${STAR_POINTS[s] > 1 ? 's' : ''} par carte · cliquer pour filtrer`;
+  }
+
+  cardData.families.forEach((name, f) => {
+    const { owned: got, total } = getFamilyProgress(f);
+    const medal = familyElements[f];
+    if (!medal) return;
+    medal.querySelector('.album-bar')?.remove();
+    medal.appendChild(progressBar(got, total));
+    medal.classList.toggle('complete', got === total);
+    medal.dataset.tip = `Famille : ${name}\nComplétion de la famille : ${got} / ${total} (${percent(got, total)}%)`;
+  });
+
+  if (cardElements[1]) renderResultCount();
+
+  const p = getPoints();
+  document.getElementById('albumPoints').textContent =
+    `Points : ${p.cards} (cartes) + ${p.families} (familles) + ${p.bonus} (Dofus) = ${p.total}`;
+  updatePointsInfo();
+}
+
+function toggleCard(n) {
+  ownedCards.has(n) ? ownedCards.delete(n) : ownedCards.add(n);
+  saveAlbum();
+  refreshAlbum();
+}
+
+// Instant tooltip (the native title one takes a second to show)
+function setupAlbumTooltip(album) {
+  const tip = document.getElementById('albumTip');
+  let current = null;
+  album.addEventListener('mouseover', (e) => {
+    current = e.target.closest('[data-tip]');
+    tip.hidden = !current;
+    if (current) tip.textContent = current.dataset.tip;
+  });
+  album.addEventListener('mousemove', (e) => {
+    if (tip.hidden) return;
+    const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    const y = Math.min(e.clientY + 18, window.innerHeight - tip.offsetHeight - 8);
+    tip.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  album.addEventListener('mouseleave', () => (tip.hidden = true));
+  // Keep the text in sync when a click changes the hovered element's counts
+  album.addEventListener('click', () => {
+    if (current?.isConnected && current.dataset.tip) tip.textContent = current.dataset.tip;
+    else tip.hidden = true;
+  });
+}
+
+function setupAlbum() {
+  const overlay = document.getElementById('albumOverlay');
+  const album = overlay.querySelector('.album');
+  const close = () => (overlay.hidden = true);
+  document.getElementById('albumBtn').addEventListener('click', () => {
+    overlay.hidden = false;
+    layoutAlbumGrid();
+  });
+  document.getElementById('albumClose').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+  const search = document.getElementById('albumSearch');
+  document.addEventListener('keydown', (e) => {
+    if (overlay.hidden) return;
+    if (e.key === 'Escape') {
+      // First Escape empties the search, the next one closes the album
+      if (document.activeElement === search && search.value) {
+        search.value = '';
+        filterCards();
+      } else close();
+      return;
+    }
+    // "/" jumps to the search, like on most sites
+    if (e.key === '/' && document.activeElement !== search) {
+      e.preventDefault();
+      search.focus();
+    }
+  });
+  window.addEventListener('resize', () => !overlay.hidden && layoutAlbumGrid());
+
+  const grid = document.getElementById('cardGrid');
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.album-card');
+    if (card) toggleCard(parseInt(card.dataset.n));
+  });
+
+  document.getElementById('familyGrid').addEventListener('click', (e) => {
+    const medal = e.target.closest('.family-medal');
+    if (!medal) return;
+    const f = parseInt(medal.dataset.f);
+    albumFamily = albumFamily === f ? null : f;
+    filterCards();
+  });
+  document.getElementById('rarityStats').addEventListener('click', (e) => {
+    const row = e.target.closest('.rarity-row');
+    if (!row) return;
+    const s = parseInt(row.dataset.rarity);
+    albumRarities.has(s) ? albumRarities.delete(s) : albumRarities.add(s);
+    filterCards();
+  });
+  document.getElementById('typeStats').addEventListener('click', (e) => {
+    if (!e.target.closest('#ownedTypeRow')) return;
+    albumOwnership = albumOwnership === 'owned' ? 'all' : 'owned';
+    filterCards();
+  });
+  document.querySelector('.album-segment').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-own]');
+    if (!b) return;
+    albumOwnership = b.dataset.own;
+    filterCards();
+  });
+  document.getElementById('albumFamilyClear').addEventListener('click', () => {
+    albumFamily = null;
+    filterCards();
+  });
+  document.getElementById('albumReset').addEventListener('click', resetAlbumFilters);
+  document.getElementById('albumEmptyReset').addEventListener('click', resetAlbumFilters);
+  search.addEventListener('input', filterCards);
+  setupAlbumTooltip(album);
+
+  const bonusField = document.getElementById('bonusField');
+  bonusField.value = bonusPoints;
+  bonusField.addEventListener('input', () => {
+    bonusPoints = parseInt(bonusField.value) || 0;
+    saveAlbum();
+    refreshAlbum();
+  });
+}
+
 // === Export / Import ===
 
 function exportSave() {
@@ -610,7 +966,8 @@ function exportSave() {
     donjons: [...unlockedDonjons],
     temples: [...unlockedTemples],
     autres,
-    points: totalPoints,
+    cards: [...ownedCards],
+    bonus: bonusPoints,
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -631,16 +988,18 @@ function importSave(file) {
       }
       if (!confirm('Remplacer la progression actuelle ?')) return;
 
-      unlockedSubareas = new Set(data.zones);
+      unlockedSubareas = new Set(data.zones.map(mergedSubarea));
       unlockedTemples = new Set(data.temples || []);
       autres = data.autres || [];
       unlockedDonjons = migrateDonjons(data.donjons, autres);
-      totalPoints = data.points || 0;
+      ownedCards = new Set(data.cards || []);
+      // Saves from before the album carry hand-typed points: keep them as bonus
+      bonusPoints = data.bonus ?? data.points ?? 0;
 
-      document.getElementById('pointsField').value = totalPoints;
+      document.getElementById('bonusField').value = bonusPoints;
       saveZones();
       savePOI();
-      localStorage.setItem('cartdof_points', totalPoints);
+      saveAlbum();
 
       for (const el of cellElements) {
         el.classList.toggle('unlocked', unlockedSubareas.has(parseInt(el.dataset.subarea)));
@@ -650,6 +1009,7 @@ function importSave(file) {
       updateStats();
       renderPOILists();
       renderZoneList();
+      refreshAlbum();
     } catch {
       alert('Erreur de lecture du fichier');
     }
@@ -873,13 +1233,15 @@ function setupEvents() {
 // === Init ===
 
 async function init() {
-  const [cellsData, namesData] = await Promise.all([
+  const [cellsData, namesData, albumData] = await Promise.all([
     fetch('public/map-data.json').then((r) => r.json()),
     fetch('public/subarea-names.json').then((r) => r.json()),
+    fetch('public/cards.json').then((r) => r.json()),
   ]);
 
   cells = cellsData;
   subareaNames = namesData;
+  cardData = albumData;
   mapGrid.style.width = MAP_W + 'px';
   mapGrid.style.height = MAP_H + 'px';
 
@@ -907,13 +1269,10 @@ async function init() {
   applyTempleMarkers();
   fitToScreen();
 
-  const pointsField = document.getElementById('pointsField');
-  pointsField.value = totalPoints;
-  pointsField.addEventListener('input', () => {
-    totalPoints = parseInt(pointsField.value) || 0;
-    localStorage.setItem('cartdof_points', totalPoints);
-    updatePointsInfo();
-  });
+  buildAlbum();
+  setupAlbum();
+  filterCards();
+  refreshAlbum();
 
   updateStats();
   setupEvents();
