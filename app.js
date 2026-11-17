@@ -17,6 +17,54 @@ const COST_TIERS = [
   { max: Infinity, cost: 5 },
 ];
 
+// Dungeon entrances (source: dotrofus.com/donjons — Dofus Rétro 1.29)
+const DUNGEONS = [
+  { id: 'incarnam', name: "Donjon d'Incarnam", boss: 'Milimilou', x: 6, y: 5, level: 10 },
+  { id: 'ensable', name: 'Donjon ensablé', boss: "Mob l'Éponge", x: 13, y: -28, level: 20 },
+  { id: 'champs', name: 'Donjon des Champs', boss: 'Tournesol Affamé', x: 7, y: -25, level: 20 },
+  { id: 'bouftous', name: 'Donjon des Bouftous', boss: 'Bouftou Royal', x: 2, y: -34, level: 25 },
+  { id: 'rats-amakna', name: "Donjon des Rats du Château d'Amakna", boss: 'Sphincter Cell', x: 6, y: -9, level: 160 },
+  { id: 'craqueleurs', name: 'Donjon des Craqueleurs', boss: 'Craqueleur Légendaire', x: -3, y: -7, level: 50 },
+  { id: 'larves', name: 'Donjon des Larves', boss: 'Shin Larve', x: -2, y: -5, level: 60 },
+  { id: 'abraknydes', name: 'Donjon des Abraknydes', boss: 'Abraknyde Ancestral', x: -9, y: -14, level: 90 },
+  { id: 'chene-mou', name: 'Donjon du Chêne Mou', boss: 'Chêne Mou', x: -9, y: -14, level: 160 },
+  { id: 'familiers', name: 'Sanctuaire des Familiers', boss: 'Familiers', x: -7, y: -1, level: 1 },
+  { id: 'tofu-royal', name: 'Donjon du Tofu Royal', boss: 'Tofu Royal', x: 5, y: 6, level: 120 },
+  { id: 'tofus', name: 'Donjon des Tofus', boss: 'Batofu', x: 5, y: 6, level: 40 },
+  { id: 'squelettes', name: 'Donjon des Squelettes', boss: 'Chafer', x: 10, y: 15, level: 40 },
+  { id: 'forgerons', name: 'Donjon des Forgerons', boss: 'Coffre des Forgerons', x: 13, y: 21, level: 40 },
+  { id: 'scarafeuilles', name: 'Donjon des Scarafeuilles', boss: 'Scarabosse Doré', x: 1, y: 26, level: 50 },
+  { id: 'dragoeufs', name: 'Sanctuaire des Dragoeufs', boss: 'Crocabulia', x: -3, y: 24, level: 120 },
+  { id: 'dragon-cochon', name: 'Antre du Dragon Cochon', boss: 'Dragon Cochon', x: -1, y: 33, level: 100 },
+  { id: 'bworks', name: 'Donjon des Bworks', boss: 'Bworkette', x: -5, y: 10, level: 50 },
+  { id: 'fungus', name: 'Donjon Fungus', boss: 'Ougah', x: -18, y: 28, level: 190 },
+  { id: 'rats-brakmar', name: 'Donjon des Rats de Brâkmar', boss: 'Rat Noir', x: -26, y: 31, level: 110 },
+  { id: 'rats-bonta', name: 'Donjon des Rats de Bonta', boss: 'Rat Blanc', x: -35, y: -59, level: 110 },
+  { id: 'bworker', name: 'Donjon du Bworker', boss: 'Bworker', x: -21, y: 12, level: 190 },
+  { id: 'canides', name: 'Donjon des Canidés', boss: 'Meulou', x: -24, y: 1, level: 100 },
+  { id: 'skeunk', name: 'Repaire de Skeunk', boss: 'Skeunk', x: -20, y: 10, level: 120 },
+  { id: 'koulosse', name: 'Donjon du Koulosse', boss: 'Koulosse', x: -17, y: 8, level: 100 },
+  { id: 'blops', name: 'Donjon des Blops', boss: 'Blops Royaux', x: -25, y: -17, level: 60 },
+  { id: 'corbac', name: 'Donjon du Maître Corbac', boss: 'Maître Corbac', x: -20, y: -62, level: 100 },
+  { id: 'nowel', name: 'Donjon de Nowel', boss: 'Sapik', x: -63, y: -100, level: 60 },
+  { id: 'minotoror', name: 'Labyrinthe du Minotoror', boss: 'Minotoror', x: -42, y: -17, level: 120 },
+  { id: 'minotot', name: 'Labyrinthe du Minotot', boss: 'Minotot', x: -42, y: -17, level: 180 },
+  { id: 'kralamoure', name: 'Antre du Kralamoure Géant', boss: 'Kralamoure Géant', x: -60, y: -8, level: 190 },
+  { id: 'otomai', name: "Arche d'Otomaï", boss: 'Gourlo le Terrible', x: -55, y: -4, level: 90 },
+  { id: 'rasboul', name: 'Goulet du Rasboul', boss: 'Silf le Rasboul Majeur', x: -51, y: 9, level: 110 },
+  { id: 'hesque', name: 'Grotte Hesque', boss: 'Corailleur Magistral', x: -59, y: 15, level: 60 },
+  { id: 'kimbo', name: 'Canopée du Kimbo', boss: 'Kimbo', x: -54, y: 16, level: 170 },
+  { id: 'tynril', name: 'Laboratoire du Tynril', boss: 'Tynril', x: -53, y: 20, level: 140 },
+  { id: 'moon', name: 'Donjon de Moon', boss: 'Moon', x: 31, y: 8, level: 100 },
+  { id: 'wabbit', name: 'Donjon Wabbit', boss: 'Wa Wabbit', x: 24, y: -13, level: 160 },
+  { id: 'bulbes', name: 'Donjon des Bulbes', boss: 'Bulbig', x: 19, y: -22, level: 40 },
+  { id: 'pandikazes', name: 'Repaire des Pandikazes', boss: 'Maître Pandore', x: 18, y: -36, level: 120 },
+  { id: 'kitsounes', name: 'Donjon des Kitsounes', boss: 'Tanukouï San', x: 32, y: -38, level: 150 },
+  { id: 'firefoux', name: 'Donjon des Firefoux', boss: 'Péki Péki', x: 28, y: -52, level: 190 },
+];
+
+const DUNGEON_BY_ID = Object.fromEntries(DUNGEONS.map((d) => [d.id, d]));
+
 const TEMPLES = [
   { subareaId: 13, name: 'Féca' },
   { subareaId: 14, name: 'Osamodas' },
@@ -29,7 +77,8 @@ const TEMPLES = [
   { subareaId: 21, name: 'Sadida' },
   { subareaId: 26, name: 'Eniripsa' },
   { subareaId: 41, name: 'Sacrieur' },
-  { subareaId: null, name: 'Pandawa', key: 'pandawa' },
+  // Pandawa temple has no dedicated subarea; entrance in the Amakna forest
+  { subareaId: null, name: 'Pandawa', key: 'pandawa', x: 5, y: 20 },
 ];
 
 const TEMPLE_SUBAREA_IDS = new Set(
@@ -50,9 +99,9 @@ for (let col = 0; col < 130; col++) {
 let cells = [];
 let subareaNames = {};
 let unlockedSubareas = new Set(JSON.parse(localStorage.getItem('cartdof_unlocked') || '[]'));
-let donjons = JSON.parse(localStorage.getItem('cartdof_donjons') || '[]');
 let unlockedTemples = new Set(JSON.parse(localStorage.getItem('cartdof_temples_v2') || '[]'));
 let autres = JSON.parse(localStorage.getItem('cartdof_autres') || '[]');
+let unlockedDonjons = loadDonjons();
 let totalPoints = parseInt(localStorage.getItem('cartdof_points') || '0');
 
 let scale = 1;
@@ -68,6 +117,7 @@ let currentHoverCell = null;
 const cellsBySubarea = {};
 const cellsByCoord = {};
 let cellElements = [];
+let markerElements = [];
 
 // === DOM refs ===
 
@@ -104,7 +154,54 @@ function getAffordableUnlocks(points, alreadyUnlocked) {
 }
 
 function getTotalUnlocked() {
-  return unlockedSubareas.size + donjons.length + unlockedTemples.size + autres.length;
+  return unlockedSubareas.size + unlockedDonjons.size + unlockedTemples.size + autres.length;
+}
+
+// === Dungeon helpers ===
+
+function normalizeName(s) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+// Converts legacy saves ({ name, x, y } objects) into dungeon ids.
+// Entries that match no known dungeon are moved to "autres" so no point is lost.
+function migrateDonjons(list, autresList) {
+  const ids = new Set();
+  for (const item of list || []) {
+    if (typeof item === 'string') {
+      if (DUNGEON_BY_ID[item]) ids.add(item);
+      continue;
+    }
+    const sameCoords = DUNGEONS.filter((d) => d.x === item.x && d.y === item.y && !ids.has(d.id));
+    const byName = DUNGEONS.find((d) => normalizeName(d.name) === normalizeName(item.name || ''));
+    const match =
+      (byName && !ids.has(byName.id) && byName) ||
+      sameCoords.find((d) => normalizeName(item.name || '').includes(normalizeName(d.boss))) ||
+      sameCoords[0];
+    if (match) ids.add(match.id);
+    else autresList.push({ name: `${item.name} [${item.x}, ${item.y}]` });
+  }
+  return ids;
+}
+
+function loadDonjons() {
+  const v2 = localStorage.getItem('cartdof_donjons_v2');
+  if (v2) return new Set(JSON.parse(v2).filter((id) => DUNGEON_BY_ID[id]));
+  const legacy = JSON.parse(localStorage.getItem('cartdof_donjons') || '[]');
+  const ids = migrateDonjons(legacy, autres);
+  localStorage.setItem('cartdof_donjons_v2', JSON.stringify([...ids]));
+  localStorage.setItem('cartdof_autres', JSON.stringify(autres));
+  localStorage.removeItem('cartdof_donjons');
+  return ids;
+}
+
+function toggleDonjon(id) {
+  if (!DUNGEON_BY_ID[id]) return;
+  unlockedDonjons.has(id) ? unlockedDonjons.delete(id) : unlockedDonjons.add(id);
+  savePOI();
+  applyPOIMarkers();
+  updateStats();
+  renderPOILists();
 }
 
 // === Temple helpers ===
@@ -132,7 +229,7 @@ function saveZones() {
 }
 
 function savePOI() {
-  localStorage.setItem('cartdof_donjons', JSON.stringify(donjons));
+  localStorage.setItem('cartdof_donjons_v2', JSON.stringify([...unlockedDonjons]));
   localStorage.setItem('cartdof_temples_v2', JSON.stringify([...unlockedTemples]));
   localStorage.setItem('cartdof_autres', JSON.stringify(autres));
 }
@@ -151,12 +248,73 @@ function applyCalibration() {
   }
 }
 
+function getCellCenter(x, y) {
+  const col = x - FULL_MIN_X;
+  const row = y - FULL_MIN_Y;
+  const colWidth = (col < COL_SPLIT ? BASE_W1 : BASE_W2) * CAL.scaleX;
+  return {
+    left: CAL.offX + baseColX[col] * CAL.scaleX + colWidth / 2,
+    top: CAL.offY + row * CAL.cellH + CAL.cellH / 2,
+  };
+}
+
+function getTemplePosition(temple) {
+  if (temple.subareaId === null) return { x: temple.x, y: temple.y };
+  const el = (cellsBySubarea[temple.subareaId] || [])[0];
+  return el ? { x: parseInt(el.dataset.gx), y: parseInt(el.dataset.gy) } : null;
+}
+
+// Clickable dungeon / temple icons, laid out side by side when they share a map
+function createMarkers() {
+  const groups = {};
+  const items = [
+    ...DUNGEONS.map((d) => ({ type: 'donjon', key: d.id, x: d.x, y: d.y })),
+    ...TEMPLES.map((t) => ({ type: 'temple', key: getTempleKey(t), ...getTemplePosition(t) })),
+  ].filter((m) => m.x !== undefined);
+  for (const m of items) (groups[m.x + ',' + m.y] ||= []).push(m);
+
+  const fragment = document.createDocumentFragment();
+  for (const group of Object.values(groups)) {
+    group.forEach((m, i) => {
+      const { left, top } = getCellCenter(m.x, m.y);
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = `poi-marker ${m.type}-marker`;
+      el.dataset.type = m.type;
+      el.dataset.key = m.key;
+      el.style.left = left + 'px';
+      el.style.top = top + 'px';
+      el.style.setProperty('--dx', i - (group.length - 1) / 2);
+      fragment.appendChild(el);
+      markerElements.push(el);
+    });
+  }
+  mapGrid.appendChild(fragment);
+}
+
+function isMarkerUnlocked(el) {
+  if (el.dataset.type === 'donjon') return unlockedDonjons.has(el.dataset.key);
+  const raw = el.dataset.key;
+  return unlockedTemples.has(isNaN(parseInt(raw)) ? raw : parseInt(raw));
+}
+
+function refreshMarkers() {
+  for (const el of markerElements) el.classList.toggle('unlocked', isMarkerUnlocked(el));
+}
+
+function updateMarkerScale() {
+  // Keep icons readable when zoomed out, without growing past their natural size when zoomed in
+  mapGrid.style.setProperty('--marker-scale', Math.min(3, Math.max(1, 0.45 / scale)));
+}
+
 function applyPOIMarkers() {
   for (const el of cellElements) el.classList.remove('has-donjon');
-  for (const d of donjons) {
+  for (const id of unlockedDonjons) {
+    const d = DUNGEON_BY_ID[id];
     const el = cellsByCoord[d.x + ',' + d.y];
     if (el) el.classList.add('has-donjon');
   }
+  refreshMarkers();
 }
 
 function applyTempleMarkers() {
@@ -168,10 +326,12 @@ function applyTempleMarkers() {
       }
     }
   }
+  refreshMarkers();
 }
 
 function applyTransform() {
   mapGrid.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+  updateMarkerScale();
 }
 
 function fitToScreen() {
@@ -192,7 +352,7 @@ function updateStats() {
   const pct = total > 0 ? Math.round((unlocked / total) * 100) : 0;
   statsEl.innerHTML =
     `<span class="count">${unlocked}</span> / ${total} zones (${pct}%)` +
-    ` · <span style="color:#dc3232">${donjons.length} DJ</span>` +
+    ` · <span style="color:#dc3232">${unlockedDonjons.size} DJ</span>` +
     ` · <span style="color:#a050dc">${unlockedTemples.size} T</span>`;
   updatePointsInfo();
 }
@@ -227,11 +387,11 @@ function updatePointsInfo() {
 
 function updateSectionStates() {
   const $ = (id) => document.getElementById(id);
-  $('sectionDonjons').classList.toggle('has-items', donjons.length > 0);
+  $('sectionDonjons').classList.toggle('has-items', true);
   $('sectionTemples').classList.toggle('has-items', true);
   $('sectionAutres').classList.toggle('has-items', autres.length > 0);
   $('sectionZones').classList.toggle('has-items', unlockedSubareas.size > 0);
-  $('donjonCount').textContent = `${donjons.length} sur 42`;
+  $('donjonCount').textContent = `${unlockedDonjons.size} sur ${DUNGEONS.length}`;
   $('templeCount').textContent = `${unlockedTemples.size} sur ${TEMPLES.length}`;
   $('autreCount').textContent = autres.length
     ? `${autres.length} zone${autres.length > 1 ? 's' : ''}`
@@ -264,17 +424,19 @@ function renderZoneList() {
 }
 
 function renderPOILists() {
-  document.getElementById('donjonList').innerHTML = donjons.length
-    ? donjons
-        .map(
-          (d) =>
-            `<li class="poi-item donjon-item">
-              <div><span class="poi-name">${d.name}</span> <span class="poi-coords">[${d.x}, ${d.y}]</span></div>
-              <button class="poi-delete" data-x="${d.x}" data-y="${d.y}">&times;</button>
-            </li>`
-        )
-        .join('')
-    : '<li class="empty-msg">Aucun donjon ajouté</li>';
+  document.getElementById('donjonList').innerHTML = [...DUNGEONS]
+    .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+    .map(
+      (d) =>
+        `<li class="poi-item donjon-item">
+          <label class="temple-check donjon-check">
+            <input type="checkbox" data-donjon-id="${d.id}" ${unlockedDonjons.has(d.id) ? 'checked' : ''} />
+            <span class="poi-name">${d.name}</span>
+          </label>
+          <span class="poi-coords" title="Niveau ${d.level}">[${d.x}, ${d.y}]</span>
+        </li>`
+    )
+    .join('');
 
   document.getElementById('templeList').innerHTML = TEMPLES.map((t) => {
     const key = getTempleKey(t);
@@ -317,23 +479,6 @@ function toggleSubarea(subareaId) {
   renderZoneList();
 }
 
-function addDonjon(name, x, y) {
-  if (donjons.some((d) => d.x === x && d.y === y)) return;
-  donjons.push({ name, x, y });
-  savePOI();
-  applyPOIMarkers();
-  updateStats();
-  renderPOILists();
-}
-
-function removeDonjon(x, y) {
-  donjons = donjons.filter((d) => !(d.x === x && d.y === y));
-  savePOI();
-  applyPOIMarkers();
-  updateStats();
-  renderPOILists();
-}
-
 function addAutre(name) {
   autres.push({ name });
   savePOI();
@@ -367,12 +512,32 @@ function buildTooltipHtml(cell, subareaId) {
 
   const gx = parseInt(cell.dataset.gx);
   const gy = parseInt(cell.dataset.gy);
-  const donjon = donjons.find((d) => d.x === gx && d.y === gy);
-  if (donjon) {
-    html += `<br><span class="donjon-info">Donjon: ${donjon.name}</span>`;
+  for (const d of DUNGEONS) {
+    if (d.x === gx && d.y === gy) {
+      const unlocked = unlockedDonjons.has(d.id) ? ' (déverrouillé)' : '';
+      html += `<br><span class="donjon-info">Donjon : ${d.name}${unlocked}</span>`;
+    }
   }
 
   return html;
+}
+
+function buildMarkerTooltipHtml(marker) {
+  const unlocked = isMarkerUnlocked(marker);
+  const status = unlocked
+    ? '<span class="marker-status unlocked">Déverrouillé — cliquer pour retirer</span>'
+    : `<span class="marker-status">Verrouillé — cliquer pour débloquer (${getCostForNth(getTotalUnlocked() + 1)} pt)</span>`;
+
+  if (marker.dataset.type === 'donjon') {
+    const d = DUNGEON_BY_ID[marker.dataset.key];
+    return (
+      `<span class="donjon-info">${d.name}</span><br>` +
+      `Boss : ${d.boss} · Niv. ${d.level} · [${d.x}, ${d.y}]<br>${status}`
+    );
+  }
+  const temple = TEMPLES.find((t) => String(getTempleKey(t)) === marker.dataset.key);
+  const p = getTemplePosition(temple);
+  return `<span class="temple-info">Temple ${temple.name}</span><br>[${p.x}, ${p.y}]<br>${status}`;
 }
 
 function clearHoverHighlight() {
@@ -388,7 +553,7 @@ function clearHoverHighlight() {
 function exportSave() {
   const data = {
     zones: [...unlockedSubareas],
-    donjons,
+    donjons: [...unlockedDonjons],
     temples: [...unlockedTemples],
     autres,
     points: totalPoints,
@@ -413,9 +578,9 @@ function importSave(file) {
       if (!confirm('Remplacer la progression actuelle ?')) return;
 
       unlockedSubareas = new Set(data.zones);
-      donjons = data.donjons;
       unlockedTemples = new Set(data.temples || []);
       autres = data.autres || [];
+      unlockedDonjons = migrateDonjons(data.donjons, autres);
       totalPoints = data.points || 0;
 
       document.getElementById('pointsField').value = totalPoints;
@@ -452,12 +617,32 @@ function setupEvents() {
   mapGrid.addEventListener('mousedown', () => (hasMoved = false));
   mapGrid.addEventListener('click', (e) => {
     if (hasMoved) return;
+    const marker = e.target.closest('.poi-marker');
+    if (marker) {
+      if (marker.dataset.type === 'donjon') toggleDonjon(marker.dataset.key);
+      else {
+        const raw = marker.dataset.key;
+        toggleTempleByKey(isNaN(parseInt(raw)) ? raw : parseInt(raw));
+      }
+      tooltipEl.innerHTML = buildMarkerTooltipHtml(marker);
+      return;
+    }
     const cell = e.target.closest('.cell');
     if (cell) toggleSubarea(parseInt(cell.dataset.subarea));
   });
 
   // Map: hover tooltip
   mapGrid.addEventListener('mousemove', (e) => {
+    const marker = e.target.closest('.poi-marker');
+    if (marker) {
+      if (marker === currentHoverCell) return;
+      clearHoverHighlight();
+      currentHoverSubarea = null;
+      currentHoverCell = marker;
+      tooltipEl.innerHTML = buildMarkerTooltipHtml(marker);
+      tooltipEl.style.display = 'block';
+      return;
+    }
     const cell = e.target.closest('.cell');
     if (!cell) {
       if (currentHoverCell) {
@@ -577,10 +762,10 @@ function setupEvents() {
     renderZoneList();
   });
 
-  // Donjon list: delete
-  document.getElementById('donjonList').addEventListener('click', (e) => {
-    const btn = e.target.closest('.poi-delete');
-    if (btn) removeDonjon(parseInt(btn.dataset.x), parseInt(btn.dataset.y));
+  // Donjon list: checkbox toggle
+  document.getElementById('donjonList').addEventListener('change', (e) => {
+    const cb = e.target.closest('input[data-donjon-id]');
+    if (cb) toggleDonjon(cb.dataset.donjonId);
   });
 
   // Temple list: checkbox toggle
@@ -598,23 +783,11 @@ function setupEvents() {
     if (btn) removeAutre(parseInt(btn.dataset.index));
   });
 
-  // Add modal (donjons & autres)
-  let modalType = null;
+  // Add modal (autres)
   const modalOverlay = document.getElementById('modalOverlay');
   const modalForm = document.getElementById('modalForm');
-  const modalCoords = document.querySelector('#modalOverlay .coord-row');
 
-  function openModal(type) {
-    modalType = type;
-    const cfg = {
-      donjon: { label: 'Ajouter un donjon', color: 'donjon-color' },
-      autre: { label: 'Ajouter une zone cachée', color: 'autre-color' },
-    };
-    document.getElementById('modalTitle').textContent = cfg[type].label;
-    document.getElementById('modalTitle').className = 'modal-title ' + cfg[type].color;
-    modalCoords.style.display = type === 'autre' ? 'none' : '';
-    document.getElementById('modalX').required = type !== 'autre';
-    document.getElementById('modalY').required = type !== 'autre';
+  function openModal() {
     modalForm.reset();
     modalOverlay.hidden = false;
     document.getElementById('modalName').focus();
@@ -622,29 +795,18 @@ function setupEvents() {
 
   function closeModal() {
     modalOverlay.hidden = true;
-    modalType = null;
   }
 
-  document.getElementById('addDonjonBtn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    openModal('donjon');
-  });
   document.getElementById('addAutreBtn').addEventListener('click', (e) => {
     e.stopPropagation();
-    openModal('autre');
+    openModal();
   });
 
   modalForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('modalName').value.trim();
     if (!name) return;
-    if (modalType === 'autre') {
-      addAutre(name);
-    } else {
-      const x = parseInt(document.getElementById('modalX').value);
-      const y = parseInt(document.getElementById('modalY').value);
-      if (!isNaN(x) && !isNaN(y)) addDonjon(name, x, y);
-    }
+    addAutre(name);
     closeModal();
   });
 
@@ -685,6 +847,7 @@ async function init() {
   mapGrid.appendChild(fragment);
 
   applyCalibration();
+  createMarkers();
   applyPOIMarkers();
   applyTempleMarkers();
   fitToScreen();

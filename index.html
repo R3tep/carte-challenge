@@ -73,7 +73,6 @@
         <div class="sidebar-section" id="sectionDonjons">
           <h2 class="sidebar-title donjon-color">
             <span>Donjons <em class="section-count" id="donjonCount"></em></span>
-            <button class="add-btn" id="addDonjonBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
           </h2>
           <div class="sidebar-content">
             <ul class="poi-list" id="donjonList"></ul>
@@ -106,13 +105,9 @@
 
       <div class="modal-overlay" id="modalOverlay" hidden>
         <div class="modal" role="dialog" aria-modal="true">
-          <h3 class="modal-title" id="modalTitle"></h3>
+          <h3 class="modal-title autre-color" id="modalTitle">Ajouter une zone cachée</h3>
           <form class="add-form" id="modalForm">
             <input type="text" placeholder="Nom" required id="modalName" />
-            <div class="coord-row">
-              <input type="number" placeholder="X" required id="modalX" />
-              <input type="number" placeholder="Y" required id="modalY" />
-            </div>
             <div class="modal-actions">
               <button type="submit">Ajouter</button>
               <button type="button" id="modalCancel">Annuler</button>

@@ -190,6 +190,45 @@ button:hover {
   background-color: rgba(160, 80, 220, 0.65);
 }
 
+/* === Dungeon / temple markers === */
+.poi-marker {
+  position: absolute;
+  z-index: 20;
+  width: 30px;
+  height: 25px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent center / contain no-repeat;
+  cursor: pointer;
+  transform: translate(-50%, -50%) scale(var(--marker-scale, 1)) translateX(calc(var(--dx, 0) * 105%));
+  filter: grayscale(1) brightness(0.75) drop-shadow(0 0 1px #000);
+  opacity: 0.8;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.poi-marker:hover {
+  background-color: transparent;
+  opacity: 1;
+  filter: grayscale(0.3) brightness(1) drop-shadow(0 0 2px #fff);
+  z-index: 30;
+}
+
+.poi-marker.donjon-marker { background-image: url('public/icons/donjon.png'); }
+.poi-marker.temple-marker { background-image: url('public/icons/temple.svg'); }
+
+.poi-marker.unlocked {
+  opacity: 1;
+  filter: drop-shadow(0 0 3px #ffd34d) drop-shadow(0 0 1px #000);
+}
+
+.poi-marker.temple-marker.unlocked {
+  filter: drop-shadow(0 0 3px #c58cff) drop-shadow(0 0 1px #000);
+}
+
+.tooltip .marker-status { color: #888; font-size: 12px; }
+.tooltip .marker-status.unlocked { color: #4caf50; }
+
 /* === Sidebar === */
 .sidebar {
   width: 260px;
@@ -343,6 +382,10 @@ button:hover {
 .temple-check input[type='checkbox'] {
   accent-color: #a050dc;
   cursor: pointer;
+}
+
+.donjon-check input[type='checkbox'] {
+  accent-color: #dc3232;
 }
 
 .empty-msg {
