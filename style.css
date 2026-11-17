@@ -151,8 +151,28 @@ button:hover {
 }
 
 .cell.unlocked {
-  background-color: rgba(255, 140, 0, 0.5);
+  --edge-dark: #7a3300;
+  --edge-light: rgba(255, 226, 170, 0.85);
+  --t: 0; --r: 0; --b: 0; --l: 0;
+  background-color: rgba(255, 140, 0, 0.42);
+  /* no inner grid inside a zone: it reads as one solid area */
+  border-color: transparent;
+  /* zone outline: dark line on the zone edge + thin light line just inside it */
+  box-shadow:
+    inset 0 calc(var(--t) * 2px) 0 0 var(--edge-dark),
+    inset calc(var(--r) * -2px) 0 0 0 var(--edge-dark),
+    inset 0 calc(var(--b) * -2px) 0 0 var(--edge-dark),
+    inset calc(var(--l) * 2px) 0 0 0 var(--edge-dark),
+    inset 0 calc(var(--t) * 3.5px) 0 0 var(--edge-light),
+    inset calc(var(--r) * -3.5px) 0 0 0 var(--edge-light),
+    inset 0 calc(var(--b) * -3.5px) 0 0 var(--edge-light),
+    inset calc(var(--l) * 3.5px) 0 0 0 var(--edge-light);
 }
+
+.cell.unlocked.e-t { --t: 1; }
+.cell.unlocked.e-r { --r: 1; }
+.cell.unlocked.e-b { --b: 1; }
+.cell.unlocked.e-l { --l: 1; }
 
 .cell.unlocked:hover {
   background-color: rgba(255, 140, 0, 0.65);

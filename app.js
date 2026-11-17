@@ -329,6 +329,26 @@ function updateMarkerScale() {
   mapGrid.style.setProperty('--marker-scale', Math.min(3, Math.max(1, 0.45 / scale)));
 }
 
+// Outline each unlocked zone: mark the sides of its cells whose neighbour belongs to another subarea
+const EDGE_SIDES = [
+  ['e-t', 0, -1],
+  ['e-r', 1, 0],
+  ['e-b', 0, 1],
+  ['e-l', -1, 0],
+];
+
+function applyZoneBorders() {
+  for (const el of cellElements) {
+    const unlocked = el.classList.contains('unlocked');
+    const gx = parseInt(el.dataset.gx);
+    const gy = parseInt(el.dataset.gy);
+    for (const [cls, dx, dy] of EDGE_SIDES) {
+      const neighbour = cellsByCoord[gx + dx + ',' + (gy + dy)];
+      el.classList.toggle(cls, unlocked && neighbour?.dataset.subarea !== el.dataset.subarea);
+    }
+  }
+}
+
 function applyPOIMarkers() {
   for (const el of cellElements) el.classList.remove('has-donjon');
   for (const id of unlockedDonjons) {
@@ -423,6 +443,7 @@ function updateSectionStates() {
 // === List rendering ===
 
 function renderZoneList() {
+  applyZoneBorders();
   const sorted = [...unlockedSubareas]
     .map((id) => ({
       id,
