@@ -17,6 +17,14 @@ const COST_TIERS = [
   { max: Infinity, cost: 5 },
 ];
 
+// Bonta's city is split into districts in the game data while Brâkmar is a single
+// subarea: fold the districts into one "Bonta" zone (Bordure and Arène stay apart)
+const BONTA_ID = 37;
+const MERGED_SUBAREAS = Object.fromEntries(
+  [73, 43, 44, 45, 46, 47, 48, 49, 50, 51].map((id) => [id, BONTA_ID])
+);
+const mergedSubarea = (id) => MERGED_SUBAREAS[id] ?? id;
+
 // Dungeon entrances (source: dotrofus.com/donjons — Dofus Rétro 1.29)
 const DUNGEONS = [
   { id: 'incarnam', name: "Donjon d'Incarnam", boss: 'Milimilou', x: 6, y: 5, level: 10 },
@@ -114,7 +122,10 @@ for (let col = 0; col < 130; col++) {
 
 let cells = [];
 let subareaNames = {};
-let unlockedSubareas = new Set(JSON.parse(localStorage.getItem('cartdof_unlocked') || '[]'));
+// Saved unlocks may still reference a merged Bonta district
+let unlockedSubareas = new Set(
+  JSON.parse(localStorage.getItem('cartdof_unlocked') || '[]').map(mergedSubarea)
+);
 let unlockedTemples = new Set(JSON.parse(localStorage.getItem('cartdof_temples_v2') || '[]'));
 let autres = JSON.parse(localStorage.getItem('cartdof_autres') || '[]');
 let unlockedDonjons = loadDonjons();
@@ -874,15 +885,16 @@ async function init() {
 
   const fragment = document.createDocumentFragment();
   for (const c of cells) {
+    const subarea = mergedSubarea(c.subarea);
     const el = document.createElement('div');
     el.className = 'cell';
-    el.dataset.subarea = c.subarea;
+    el.dataset.subarea = subarea;
     el.dataset.gx = c.x;
     el.dataset.gy = c.y;
 
-    if (unlockedSubareas.has(c.subarea)) el.classList.add('unlocked');
+    if (unlockedSubareas.has(subarea)) el.classList.add('unlocked');
 
-    (cellsBySubarea[c.subarea] ||= []).push(el);
+    (cellsBySubarea[subarea] ||= []).push(el);
     cellsByCoord[c.x + ',' + c.y] = el;
     cellElements.push(el);
     fragment.appendChild(el);
