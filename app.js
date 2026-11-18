@@ -27,7 +27,6 @@ const mergedSubarea = (id) => MERGED_SUBAREAS[id] ?? id;
 
 // Dungeon entrances (source: dotrofus.com/donjons — Dofus Rétro 1.29)
 const DUNGEONS = [
-  { id: 'incarnam', name: "Donjon d'Incarnam", boss: 'Milimilou', x: 6, y: 5, level: 10 },
   { id: 'ensable', name: 'Donjon ensablé', boss: "Mob l'Éponge", x: 13, y: -28, level: 20 },
   { id: 'champs', name: 'Donjon des Champs', boss: 'Tournesol Affamé', x: 7, y: -25, level: 20 },
   { id: 'bouftous', name: 'Donjon des Bouftous', boss: 'Bouftou Royal', x: 2, y: -34, level: 25 },
